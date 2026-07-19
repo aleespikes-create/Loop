@@ -1,0 +1,20 @@
+# One-file deploy config for Render.com. Persistent disk keeps the database
+# (and everyone's accounts/trades) between deploys.
+services:
+  - type: web
+    name: loop
+    runtime: node
+    plan: starter            # Starter (~$7/mo) supports the persistent disk below
+    buildCommand: npm install
+    startCommand: node server/server.js
+    envVars:
+      - key: NODE_VERSION
+        value: "22"          # app uses Node's built-in SQLite (needs Node 22.5+)
+      - key: JWT_SECRET
+        generateValue: true  # Render generates a strong secret for you
+      - key: SWAPLY_DB
+        value: /data/swaply.db
+    disk:
+      name: loop-data
+      mountPath: /data
+      sizeGB: 1
